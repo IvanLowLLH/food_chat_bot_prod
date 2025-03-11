@@ -1,0 +1,6 @@
+chromadb==0.6.3
+python-dotenv==1.0.1
+streamlit==1.43.1
+together==1.4.1
+typing_extensions==4.12.2
+firebase-admin==6.6.0
