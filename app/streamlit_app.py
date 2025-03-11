@@ -36,7 +36,7 @@ n_first_lines = 3
 
 # Rate limiting settings
 COOLDOWN_SECONDS = 2  # Time between queries
-MAX_QUERIES_PER_HOUR = 10  # Maximum queries per hour
+MAX_QUERIES_PER_HOUR = 30  # Maximum queries per hour
 QUERY_WINDOW_HOURS = 1  # Time window for query counting
 TRACK_IP = True
 
@@ -217,15 +217,16 @@ with st.sidebar:
     st.markdown("### About")
     st.markdown("""
         This chatbot helps you find the food places in Singapore based on Google Maps reviews and ratings.
+        Avoid acronyms and be specific for best results!
 
         Ask questions like:
         - "What are the best steak restaurants in Singapore?"
         - "Suggest Japanese restaurants in Bedok"
-        - "Suggest some family-friendly restaurants"
+        - If you see a restaurant you are interested in: "Tell me more about [restaurant name]"
 
         If seem to be stuck in a loop of recommending same places, press Clear Chat History.
 
-        Disclaimer: AIs are known to hallucinate so please check before going.
+        Disclaimer: AIs are known to hallucinate so please check before going!
         """)
 
 # Chat input
