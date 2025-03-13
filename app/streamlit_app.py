@@ -189,7 +189,8 @@ st.markdown("""
 
 # Header
 st.title("🍽️ Singapore Food Recommendation Chatbot")
-st.markdown("Ask me about the best restaurants in Singapore!")
+st.markdown("Ask me about food places in Singapore!  \n"
+            "For best results, try to specify a location like 'Cafes in Bugis' or 'Italian restaurants in city hall'  \n")
 
 # Display chat messages
 for message in st.session_state.messages:
