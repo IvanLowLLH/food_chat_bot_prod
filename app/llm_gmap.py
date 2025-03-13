@@ -196,7 +196,7 @@ class FoodRecommendationBot:
                          f"Previous Messages:"
                          f"{chat_history}")
         num_words = len(system_prompt.split())
-        print(f"Num words system prompt: {num_words}")
+        # print(f"Num words system prompt: {num_words}")
         if self.save_output:
             with open('system_prompt.txt', "w") as f:
                 f.write(system_prompt)
@@ -264,9 +264,9 @@ class FoodRecommendationBot:
         full_history_str = "".join(f"{msg['role']}: {msg['content']}\n" for msg in self.full_history)
         # Rewrite the query
         rewritten_query = self._rewrite_query(question, query_history_str)
-        print(f"\nRewritten query: {rewritten_query}")
+        # print(f"\nRewritten query: {rewritten_query}")
         reformat_query = self._reformat_query(rewritten_query)
-        print(f"\nReformat query: {reformat_query}")
+        # print(f"\nReformat query: {reformat_query}")
         text_dict = {}
         full_text = ""
         for part in reformat_query.split(","):
@@ -293,7 +293,7 @@ class FoodRecommendationBot:
                 nearby_subzones = self.subzone_finder.find_subzones(location, n_nearby=5)
             else:
                 nearby_subzones = self.subzone_finder.find_subzones(location, n_nearby=2)
-            print(f"Found nearby zones: {nearby_subzones}")
+            # print(f"Found nearby zones: {nearby_subzones}")
             # if first entry has planning area, that means first entry is the subzone itself. Otherwise, there is no subzone to base distance measurement
             if nearby_subzones[0][2]:
                 base_zone = nearby_subzones[0][0]
@@ -308,12 +308,12 @@ class FoodRecommendationBot:
                     # If planning_area not None, means found location_name is a subzone so can filter
                     docs = self.retrieve_class.retrieve_and_join_chunks(retrieve_query, subzone=location_name,
                                                                         planning_area=planning_area, n_results=10)
-                    print(f"Found {len(docs)} docs with query: {retrieve_query}")
+                    # print(f"Found {len(docs)} docs with query: {retrieve_query}")
                 else:
                     # If planning_area is None, means found location_name is direct from original query so no subzone
                     docs = self.retrieve_class.retrieve_and_join_chunks(retrieve_query, subzone=None,
                                                                         planning_area=None, n_results=20)
-                    print(f"Found {len(docs)} docs with query: {retrieve_query}")
+                    # print(f"Found {len(docs)} docs with query: {retrieve_query}")
                 # Only add docs not in set
                 for doc in docs:
                     place_id = doc["place_id"]
@@ -346,7 +346,7 @@ class FoodRecommendationBot:
 
         # Stream the generation
         num_docs = len(all_docs)
-        print(f"Total number of docs: {num_docs}")
+        # print(f"Total number of docs: {num_docs}")
         full_answer = ""
         for response in self._generate(question, all_docs, full_history_str):
             if isinstance(response, str):
