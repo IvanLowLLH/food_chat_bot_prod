@@ -31,6 +31,7 @@ db = firestore.client()
 
 # LLM & embedding settings
 llm_model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K"
+tool_model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K"
 embed_model_name = "BAAI/bge-large-en-v1.5"
 n_first_lines = 3
 
@@ -200,6 +201,8 @@ with st.sidebar:
     st.title("Chat Controls")
     if st.button("Clear Chat History & Restart"):
         st.session_state.messages = []
+        st.session_state.bot.query_history = []
+        st.session_state.bot.full_history = []
         st.rerun()
 
     st.markdown("---")
@@ -217,7 +220,6 @@ with st.sidebar:
     st.markdown("### About")
     st.markdown("""
         This chatbot helps you find the food places in Singapore based on Google Maps reviews and ratings.
-        Avoid acronyms and be specific for best results!
 
         Ask questions like:
         - "What are the best steak restaurants in Singapore?"

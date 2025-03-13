@@ -50,7 +50,7 @@ class RetrieveChunkChroma:
             print(f"Error getting chunks for place {place_id}: {e}")
             return []
 
-    def retrieve_and_join_chunks(self, query: str, n_results: int = 5) -> List[Dict]:
+    def retrieve_and_join_chunks(self, query: str, subzone: str = None, planning_area: str = None, n_results: int = 5) -> List[Dict]:
         """
         Search for relevant chunks and join them by place_id.
         Returns a list of dictionaries containing joined text and metadata for each place.
@@ -60,9 +60,26 @@ class RetrieveChunkChroma:
             query_embedding = self._get_embeddings(query)
 
             # Search in Chroma. Returns documents, metadata, distances
+            filter_dict = None
+            if subzone:
+                filter_dict = {
+                    'place_zone': subzone
+                }
+            if subzone and planning_area:
+                filter_dict = {
+                    "$or":[
+                        {
+                            'place_zone': subzone
+                        },
+                        {
+                            'place_area': planning_area
+                        }
+                    ]
+                }
             results = self.vector_store.query(
                 query_embeddings=[query_embedding],
                 n_results=n_results * 2,
+                where=filter_dict
             )
 
             # Group chunks by place_id
@@ -100,6 +117,7 @@ class RetrieveChunkChroma:
                     'place_name': place_info['place_name'],
                     'rating': place_info['rating'],
                     'place_zone': place_info['place_zone'],
+                    'place_area': place_info['place_area'],
                     'text': joined_text,
                     'score': best_score,
                     'num_chunks': len(all_chunks),
