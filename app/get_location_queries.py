@@ -49,7 +49,7 @@ class GetLocationSubzone:
         # Add original query at end. If no subzone match at all, then only return this
         result.append((location_query, None, None))
         # Add matched name in case of misspell in location_query
-        if area_place_match:
-            result.append((area_place_match.title(), None, None))
+        # if area_place_match:
+        #     result.append((area_place_match.title(), None, None))
 
         return result

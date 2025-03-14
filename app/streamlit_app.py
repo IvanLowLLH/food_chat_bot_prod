@@ -43,7 +43,7 @@ TRACK_IP = True
 
 client = Together()
 vector_store = chromadb.PersistentClient(
-    path="chroma_bge_large_gmapfood_long_7Mar",
+    path="chroma_bge_large_gmapfood_long_14Mar",
     settings=Settings(anonymized_telemetry=False)
 ).get_collection("gmap_food")
 
