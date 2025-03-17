@@ -50,7 +50,7 @@ class RetrieveChunkChroma:
             print(f"Error getting chunks for place {place_id}: {e}")
             return []
 
-    def retrieve_and_join_chunks(self, query: str, subzone: str = None, planning_area: str = None, n_results: int = 5) -> List[Dict]:
+    def retrieve_and_join_chunks(self, query: str, subzone: str | list = None, planning_area: str = None, n_results: int = 5) -> List[Dict]:
         """
         Search for relevant chunks and join them by place_id.
         Returns a list of dictionaries containing joined text and metadata for each place.
@@ -62,9 +62,16 @@ class RetrieveChunkChroma:
             # Search in Chroma. Returns documents, metadata, distances
             filter_dict = None
             if subzone:
-                filter_dict = {
-                    'place_zone': subzone
-                }
+                if isinstance(subzone, str):
+                    filter_dict = {
+                        'place_zone': subzone
+                    }
+                elif isinstance(subzone, list):
+                    # Include multiple subzone in filter search
+                    filter_list = []
+                    for zone in subzone:
+                        filter_list.append({'place_zone': zone})
+                    filter_dict = {"$or": filter_list}
             if subzone and planning_area:
                 filter_dict = {
                     "$or":[

@@ -33,6 +33,7 @@ db = firestore.client()
 llm_model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K"
 tool_model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K"
 embed_model_name = "BAAI/bge-large-en-v1.5"
+bm25_file = "rank_bm25result_k50"
 n_first_lines = 3
 
 # Rate limiting settings
@@ -88,6 +89,7 @@ def save_query_to_firebase(ip, query, timestamp):
     }, merge=True)
 
 
+
 def initialize_session_state():
     """Initialize session state variables."""
     if "messages" not in st.session_state:
@@ -96,6 +98,7 @@ def initialize_session_state():
         st.session_state.bot = FoodRecommendationBot(
             embded_model_name=embed_model_name,
             llm_model=llm_model,
+            bm25_file=bm25_file,
             vector_store=vector_store,
             n_first_lines=n_first_lines,
             save_output=False
@@ -138,7 +141,7 @@ def can_make_query():
     # Clean up old queries from history
     cutoff_time = current_time - timedelta(hours=QUERY_WINDOW_HOURS)
     ip_data["query_history"] = [
-        time for time in ip_data["query_history"]
+        time for time in ip_data["query_history"] 
         if parse_timestamp(time) > cutoff_time
     ]
 
@@ -211,10 +214,9 @@ with st.sidebar:
     client_ip = get_client_ip()
     queries_remaining = MAX_QUERIES_PER_HOUR - len(st.session_state.ip_tracking["query_history"])
     st.markdown(f"Queries remaining for you: **{queries_remaining}**")
-
+    
     if st.session_state.ip_tracking["query_history"]:
-        reset_time = parse_timestamp(st.session_state.ip_tracking["query_history"][0]) + timedelta(
-            hours=QUERY_WINDOW_HOURS)
+        reset_time = parse_timestamp(st.session_state.ip_tracking["query_history"][0]) + timedelta(hours=QUERY_WINDOW_HOURS)
         st.markdown(f"Next reset at: **{reset_time.strftime('%I:%M:%S %p')} SGT**")
 
     st.markdown("---")

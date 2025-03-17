@@ -1,5 +1,7 @@
 import difflib
 import json
+from typing import Dict
+
 from typing_extensions import List, Tuple
 
 class GetLocationSubzone:
@@ -26,7 +28,7 @@ class GetLocationSubzone:
         return None
 
 
-    def find_subzones(self, location_query: str, n_nearby: int ) -> List[Tuple[str, int, str]]:
+    def find_subzones(self, location_query: str, max_dist: float ) -> Dict:
         location_query = location_query.lower()
         areas_places_list = self.area_to_subzone.keys()
         subzone_list = self.subzone_nearby.keys()
@@ -37,17 +39,19 @@ class GetLocationSubzone:
         else:  # If no match, find direct from list of sub-zones
             subzone = self._find_closest_match(location_query, subzone_list)
 
-        result = []
+        result = {}
         if subzone:
             subzone_data = self.subzone_nearby[subzone]
-            nearby_subzones = subzone_data["nearest_subzone"][:n_nearby]
+            nearby_subzones = subzone_data["nearest_subzone"]
+            result['nearby_subzones'] = []
             for nearby_subzone in nearby_subzones:
                 name = nearby_subzone[0]
                 distance = nearby_subzone[1]
-                planning_area = self.subzone_nearby[name]["planning_area"]
-                result.append((name.title(), distance, planning_area.title()))
-        # Add original query at end. If no subzone match at all, then only return this
-        result.append((location_query, None, None))
+                if distance <= max_dist:
+                    result['nearby_subzones'].append(name.title())
+        # Add original query at end. If no subzone match at all, then only return original query
+        # result.append((location_query, None, None))
+        result['others'] = location_query
         # Add matched name in case of misspell in location_query
         # if area_place_match:
         #     result.append((area_place_match.title(), None, None))
