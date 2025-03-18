@@ -67,11 +67,16 @@ class RetrieveChunkChroma:
                         'place_zone': subzone
                     }
                 elif isinstance(subzone, list):
-                    # Include multiple subzone in filter search
-                    filter_list = []
-                    for zone in subzone:
-                        filter_list.append({'place_zone': zone})
-                    filter_dict = {"$or": filter_list}
+                    if len(subzone) == 1:
+                        filter_dict = {
+                            'place_zone': subzone[0]
+                        }
+                    else:
+                        # Include multiple subzone in filter search
+                        filter_list = []
+                        for zone in subzone:
+                            filter_list.append({'place_zone': zone})
+                        filter_dict = {"$or": filter_list}
             if subzone and planning_area:
                 filter_dict = {
                     "$or":[

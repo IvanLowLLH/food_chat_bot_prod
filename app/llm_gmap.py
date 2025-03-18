@@ -60,7 +60,7 @@ class FoodRecommendationBot:
         self.max_num_full_history = max_num_full_history
 
         # TODO parameterise match_cutoff
-        self.subzone_finder = GetLocationSubzone(area_file="area_to_subzone.json", subzone_file="sub_zone_nearby.json", match_cutoff=0.6)
+        self.subzone_finder = GetLocationSubzone(area_file="area_to_subzone.json", subzone_file="sub_zone_nearby.json", match_cutoff=0.75)
 
         with open(bm25_file, 'rb') as bm25result_file:
             bm25_data = pickle.load(bm25result_file)
@@ -204,7 +204,7 @@ class FoodRecommendationBot:
                       f"Previous Messages:"
                       f"{chat_history}")
         num_words = len(system_prompt.split())
-        # print(f"Num words system prompt: {num_words}")
+        print(f"Num words system prompt: {num_words}")
         if self.save_output:
             with open('system_prompt.txt', "w") as f:
                 f.write(system_prompt)
@@ -319,9 +319,9 @@ class FoodRecommendationBot:
         full_history_str = "".join(f"{msg['role']}: {msg['content']}\n" for msg in self.full_history)
         # Rewrite the query
         rewritten_query = self._rewrite_query(question, query_history_str)
-        # print(f"\nRewritten query: {rewritten_query}")
+        print(f"\nRewritten query: {rewritten_query}")
         reformat_query = self._reformat_query(rewritten_query)
-        # print(f"\nReformat query: {reformat_query}")
+        print(f"\nReformat query: {reformat_query}")
         text_dict = {}
         full_query = ""  # Full query from reformatted query
         for part in reformat_query.split(","):
@@ -344,27 +344,27 @@ class FoodRecommendationBot:
         subzone_search = {}
         if location:
             if get_nearby:
-                subzone_search = self.subzone_finder.find_subzones(location, max_dist=2)
+                subzone_search = self.subzone_finder.find_subzones(location, max_dist=3)
             else:
-                subzone_search = self.subzone_finder.find_subzones(location, max_dist=0.8)
+                subzone_search = self.subzone_finder.find_subzones(location, max_dist=1.5)
         check_subzone = subzone_search.get("nearby_subzones", None)
         if check_subzone:
             # If subzone known, can use filter to narrow down search and estimate distances
             base_zone = subzone_search["nearby_subzones"][0]
             nearby_subzone_list = subzone_search["nearby_subzones"]
             chroma_n_results = 10 * len(nearby_subzone_list)
-            # print(f"Subzones found! Query: {full_query}, Subzones: {nearby_subzone_list}")
+            print(f"Subzones found! Query: {full_query}, Subzones: {nearby_subzone_list}")
             combined_docs = self.chroma_bm25_combine(full_query, nearby_subzone_list, chroma_n_results)
-            # print("Retrieved the following: ")
+            print("Retrieved the following: ")
             for doc in combined_docs:
-                # print(f"Name: {doc['place_name']}")
+                print(f"Name: {doc['place_name']}")
                 doc_subzone = doc['place_zone']
                 distance = self.subzone_finder.subzone_distance(base_zone, doc_subzone)
                 doc['distance'] = distance
                 all_docs.append(doc)
         else:
             # If location or subzone not known, just directly query
-            # print(f"Location or subzone not found. Query: {full_query}")
+            print(f"Location or subzone not found. Query: {full_query}")
             chroma_n_results = 20
             all_docs = self.chroma_bm25_combine(full_query, [], chroma_n_results)
 
@@ -375,7 +375,7 @@ class FoodRecommendationBot:
         
         # Stream the generation
         num_docs = len(all_docs)
-        # print(f"Total number of docs: {num_docs}")
+        print(f"Total number of docs: {num_docs}")
         full_answer = ""
         for response in self._generate(question, all_docs, full_history_str):
             if isinstance(response, str):
