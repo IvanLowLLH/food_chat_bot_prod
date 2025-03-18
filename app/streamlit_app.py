@@ -3,7 +3,7 @@ from llm_gmap import FoodRecommendationBot
 import time
 from dotenv import load_dotenv
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 import requests
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -70,24 +70,24 @@ def save_ip_tracking(client_ip, tracking_data):
     db.collection("ip_tracking").document(client_ip).set(tracking_data)
 
 
-def save_query_to_firebase(ip, query, timestamp):
+def save_query_to_firebase(session_id, query, full_response, timestamp):
     """Save query details to Firestore."""
     # db.collection("queries").add({
     #     "ip": ip,
     #     "query": query,
     #     "timestamp": timestamp
     # })
-    doc_ref = db.collection("queries").document(ip)
+    doc_ref = db.collection("queries_new").document(session_id)
     # Create a dictionary for the new query
     new_query = {
         "query": query,
+        "response": full_response,
         "timestamp": timestamp
     }
     # Use arrayUnion to add the new query to the 'queries' array
     doc_ref.set({
         "queries": firestore.ArrayUnion([new_query])
     }, merge=True)
-
 
 
 def initialize_session_state():
@@ -141,7 +141,7 @@ def can_make_query():
     # Clean up old queries from history
     cutoff_time = current_time - timedelta(hours=QUERY_WINDOW_HOURS)
     ip_data["query_history"] = [
-        time for time in ip_data["query_history"] 
+        time for time in ip_data["query_history"]
         if parse_timestamp(time) > cutoff_time
     ]
 
@@ -170,7 +170,9 @@ def update_query_tracking():
 
 # Initialize session state
 initialize_session_state()
-
+if "session_start_id" not in st.session_state:
+    st.session_state.session_start_id = str(int(datetime.now(UTC).timestamp()))
+session_start_id = st.session_state.session_start_id
 # Set page config
 st.set_page_config(
     page_title="Food Recommendation Chatbot",
@@ -214,7 +216,7 @@ with st.sidebar:
     client_ip = get_client_ip()
     queries_remaining = MAX_QUERIES_PER_HOUR - len(st.session_state.ip_tracking["query_history"])
     st.markdown(f"Queries remaining for you: **{queries_remaining}**")
-    
+
     if st.session_state.ip_tracking["query_history"]:
         reset_time = parse_timestamp(st.session_state.ip_tracking["query_history"][0]) + timedelta(hours=QUERY_WINDOW_HOURS)
         st.markdown(f"Next reset at: **{reset_time.strftime('%I:%M:%S %p')} SGT**")
@@ -248,10 +250,6 @@ if prompt := st.chat_input("What kind of food are you looking for?"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Save query to Firebase
-    current_time = get_current_time()
-    save_query_to_firebase(get_client_ip(), prompt, current_time)
-
     # Get bot response
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
@@ -269,6 +267,10 @@ if prompt := st.chat_input("What kind of food are you looking for?"):
 
             message_placeholder.markdown(full_response)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+    # Save query to Firebase
+    current_time = get_current_time()
+    save_query_to_firebase(session_start_id, prompt, full_response, current_time)
 
     # Update query tracking
     update_query_tracking()
