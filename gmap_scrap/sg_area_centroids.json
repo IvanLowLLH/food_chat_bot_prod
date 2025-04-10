@@ -1,0 +1,277 @@
+[
+    {
+        "name": "Bedok",
+        "latitude": 1.324047488777255,
+        "longitude": 103.9284087645146
+    },
+    {
+        "name": "Boon Lay",
+        "latitude": 1.3147871495184762,
+        "longitude": 103.70221711969798
+    },
+    {
+        "name": "Bukit Batok",
+        "latitude": 1.355658342737512,
+        "longitude": 103.75473174654678
+    },
+    {
+        "name": "Bukit Merah",
+        "latitude": 1.2754891162839548,
+        "longitude": 103.82313513079355
+    },
+    {
+        "name": "Bukit Panjang",
+        "latitude": 1.3668221135563146,
+        "longitude": 103.77299802852737
+    },
+    {
+        "name": "Bukit Timah",
+        "latitude": 1.3299967637822554,
+        "longitude": 103.79069951448656
+    },
+    {
+        "name": "Central Water Catchment",
+        "latitude": 1.376650969556373,
+        "longitude": 103.80119650925066
+    },
+    {
+        "name": "Changi",
+        "latitude": 1.3503161366169156,
+        "longitude": 103.99782022066698
+    },
+    {
+        "name": "Choa Chu Kang",
+        "latitude": 1.3855559081225026,
+        "longitude": 103.74719055128936
+    },
+    {
+        "name": "Clementi",
+        "latitude": 1.3175917723065615,
+        "longitude": 103.7607510591082
+    },
+    {
+        "name": "Hougang",
+        "latitude": 1.3636375886263508,
+        "longitude": 103.88980038298007
+    },
+    {
+        "name": "Jurong East",
+        "latitude": 1.3204422444880133,
+        "longitude": 103.73479695959328
+    },
+    {
+        "name": "Jurong West",
+        "latitude": 1.3416119860548743,
+        "longitude": 103.70490237542552
+    },
+    {
+        "name": "Pasir Ris",
+        "latitude": 1.3786178138003993,
+        "longitude": 103.94828738015859
+    },
+    {
+        "name": "Pioneer",
+        "latitude": 1.3125850651677045,
+        "longitude": 103.67298736811259
+    },
+    {
+        "name": "Punggol",
+        "latitude": 1.4053645258849732,
+        "longitude": 103.91004606208735
+    },
+    {
+        "name": "Queenstown",
+        "latitude": 1.2890828466000621,
+        "longitude": 103.78456747895669
+    },
+    {
+        "name": "Seletar",
+        "latitude": 1.4143396755796034,
+        "longitude": 103.8770992353918
+    },
+    {
+        "name": "Sembawang",
+        "latitude": 1.455746981571218,
+        "longitude": 103.81882801739849
+    },
+    {
+        "name": "Sengkang",
+        "latitude": 1.3912795210837658,
+        "longitude": 103.88770844029706
+    },
+    {
+        "name": "Serangoon",
+        "latitude": 1.3652014976862268,
+        "longitude": 103.86781806276333
+    },
+    {
+        "name": "Kallang",
+        "latitude": 1.311124862545311,
+        "longitude": 103.86654412795669
+    },
+    {
+        "name": "Lim Chu Kang",
+        "latitude": 1.430643327572294,
+        "longitude": 103.71928522164525
+    },
+    {
+        "name": "North-Eastern Islands",
+        "latitude": 1.4016415026786766,
+        "longitude": 104.03482337840593
+    },
+    {
+        "name": "Novena",
+        "latitude": 1.326983756218567,
+        "longitude": 103.83530893009579
+    },
+    {
+        "name": "Simpang",
+        "latitude": 1.4440853779265452,
+        "longitude": 103.85291934776606
+    },
+    {
+        "name": "Southern Islands",
+        "latitude": 1.2429988851864866,
+        "longitude": 103.83584862897598
+    },
+    {
+        "name": "Sungei Kadut",
+        "latitude": 1.418126141944498,
+        "longitude": 103.75746127260173
+    },
+    {
+        "name": "Toa Payoh",
+        "latitude": 1.3366835894539675,
+        "longitude": 103.86102588040109
+    },
+    {
+        "name": "Tuas",
+        "latitude": 1.2802337981608356,
+        "longitude": 103.63310316253818
+    },
+    {
+        "name": "Western Islands",
+        "latitude": 1.2495492902606216,
+        "longitude": 103.70902832712362
+    },
+    {
+        "name": "Western Water Catchment",
+        "latitude": 1.3821297601759701,
+        "longitude": 103.68972957719383
+    },
+    {
+        "name": "Woodlands",
+        "latitude": 1.4406814398246548,
+        "longitude": 103.78770461989696
+    },
+    {
+        "name": "River Valley",
+        "latitude": 1.2980458403417232,
+        "longitude": 103.83397827612475
+    },
+    {
+        "name": "Rochor",
+        "latitude": 1.3041387858760753,
+        "longitude": 103.85328440260982
+    },
+    {
+        "name": "Singapore River",
+        "latitude": 1.2901146564026387,
+        "longitude": 103.8412097037834
+    },
+    {
+        "name": "Straits View",
+        "latitude": 1.2712516598982373,
+        "longitude": 103.85877319398098
+    },
+    {
+        "name": "Changi Bay",
+        "latitude": 1.3274226134714078,
+        "longitude": 104.02635669676263
+    },
+    {
+        "name": "Marine Parade",
+        "latitude": 1.300227625615933,
+        "longitude": 103.89627232544953
+    },
+    {
+        "name": "Downtown Core",
+        "latitude": 1.2867892007570367,
+        "longitude": 103.85549696626313
+    },
+    {
+        "name": "Marina East",
+        "latitude": 1.288517384765917,
+        "longitude": 103.87235159308376
+    },
+    {
+        "name": "Marina South",
+        "latitude": 1.2805312958615096,
+        "longitude": 103.8656285362174
+    },
+    {
+        "name": "Museum",
+        "latitude": 1.2959160692535505,
+        "longitude": 103.846717165842
+    },
+    {
+        "name": "Newton",
+        "latitude": 1.3086600235388086,
+        "longitude": 103.83807780381656
+    },
+    {
+        "name": "Orchard",
+        "latitude": 1.3038068755967878,
+        "longitude": 103.83358043570662
+    },
+    {
+        "name": "Outram",
+        "latitude": 1.282858428658497,
+        "longitude": 103.84206098411072
+    },
+    {
+        "name": "Tampines",
+        "latitude": 1.3437862578122342,
+        "longitude": 103.95402904349905
+    },
+    {
+        "name": "Tanglin",
+        "latitude": 1.3083745410722534,
+        "longitude": 103.81759500999635
+    },
+    {
+        "name": "Tengah",
+        "latitude": 1.3638533705947875,
+        "longitude": 103.72874561593811
+    },
+    {
+        "name": "Mandai",
+        "latitude": 1.4236230068029838,
+        "longitude": 103.8024596181821
+    },
+    {
+        "name": "Bishan",
+        "latitude": 1.354955435432769,
+        "longitude": 103.84043612985069
+    },
+    {
+        "name": "Ang Mo Kio",
+        "latitude": 1.3800939874180311,
+        "longitude": 103.84209764047965
+    },
+    {
+        "name": "Geylang",
+        "latitude": 1.3208955331534162,
+        "longitude": 103.88952256802547
+    },
+    {
+        "name": "Paya Lebar",
+        "latitude": 1.3593980932375498,
+        "longitude": 103.91477855999271
+    },
+    {
+        "name": "Yishun",
+        "latitude": 1.4150394042599612,
+        "longitude": 103.83711787509206
+    }
+]
