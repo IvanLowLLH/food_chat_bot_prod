@@ -10,6 +10,9 @@ Once generated, copy the files to `app` folder.
 Llama 3.1 8B as the main LLM and for query re-write + re-formatting. Edit `bm25_file` and 
 `chroma_path` variable for BM25 file and Chroma folder respectively.
 
+The chatbot uses TogetherAI API to run LLM. Create a `.env` file containing TogetherAI API token in
+as `TOGETHER_API_KEY` in the `app` folder.
+
 If you have a Firebase database that you want to save queries into, can add it to `app` folder.
 Otherwise, it is not needed.
 
