@@ -31,9 +31,10 @@ db = firestore.client()
 
 # LLM & embedding settings
 llm_model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K"
-tool_model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K"
+tool_model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K"  # For query re-write and re-format
 embed_model_name = "BAAI/bge-large-en-v1.5"
 bm25_file = "rank_bm25result_k50"
+chroma_path = "chroma_bge_large_gmapfood_long_14Mar"
 n_first_lines = 3
 
 # Rate limiting settings
@@ -44,7 +45,7 @@ TRACK_IP = True
 
 client = Together()
 vector_store = chromadb.PersistentClient(
-    path="chroma_bge_large_gmapfood_long_14Mar",
+    path=chroma_path,
     settings=Settings(anonymized_telemetry=False)
 ).get_collection("gmap_food")
 
