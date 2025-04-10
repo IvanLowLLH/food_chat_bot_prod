@@ -16,7 +16,7 @@ class FoodRecommendationBot:
     def __init__(self, embded_model_name="BAAI/bge-large-en-v1.5",
                  llm_model="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K",
                  tool_model="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K",
-                 bm25_file = "gmap_scrap/rank_bm25result_k50",
+                 bm25_file="gmap_scrap/rank_bm25result_k50",
                  client="together",
                  temperature=None,
                  print_source=False,
@@ -34,7 +34,7 @@ class FoodRecommendationBot:
         self.print_source = print_source
         self.max_tokens = max_tokens
         self.save_output = save_output
-        
+
         # Extract model name for file naming
         if self.llm_model == 'llama3.2':
             self.model_name = 'llama3.2'
@@ -42,7 +42,7 @@ class FoodRecommendationBot:
             pattern = r'(gemma-\d+|Qwen\d+\.\d+-\d+B|Meta-Llama)'
             match = re.search(pattern, llm_model)
             self.model_name = match.group()
-        
+
         # Initialize LLM and client
         self.llm = None
         self.client_endpoint = None
@@ -50,17 +50,18 @@ class FoodRecommendationBot:
             self.llm = None
         elif client == "together":
             self.client_endpoint = Together()
-        
+
         # Initialize embeddings and vector store
         self.vector_store = vector_store
-        self.retrieve_class = RetrieveChunkChroma(self.vector_store, self.client_endpoint, self.embded_model_name, n_first_lines=n_first_lines)
+        self.retrieve_class = RetrieveChunkChroma(self.vector_store, self.client_endpoint, self.embded_model_name,
+                                                  n_first_lines=n_first_lines)
 
         self.query_history = []
         self.full_history = []
         self.max_num_full_history = max_num_full_history
 
-        # TODO parameterise match_cutoff
-        self.subzone_finder = GetLocationSubzone(area_file="area_to_subzone.json", subzone_file="sub_zone_nearby.json", match_cutoff=0.75)
+        self.subzone_finder = GetLocationSubzone(area_file="area_to_subzone.json", subzone_file="sub_zone_nearby.json",
+                                                 match_cutoff=0.75)
 
         with open(bm25_file, 'rb') as bm25result_file:
             bm25_data = pickle.load(bm25result_file)
@@ -98,18 +99,18 @@ class FoodRecommendationBot:
             - Price range and ambiance
             - Key highlights from reviews
             - Overall ratings and popularity
-            
+
             Output format: [cuisine][type of place][location][any other relevant context]
-            
+
             Given query history and current query, your task is to rewrite the user's query to be more effective for semantic search in this vector database following the output format. Focus on:
             1. For cuisine: If cuisine not mentioned, do not mention.
             2. For type of place: If type of place not mentioned, assume restaurants.
             3. For location: Get location from query or from chat context. DO NOT use prepositions
             4. Include any other relevant context mentioned by user
-            
+
             Tool Description:
             {tool_description}
-            
+
             IMPORTANT: Output ONLY the rewritten query. Do not include any explanations, additional text, or formatting. The output should be a single line containing just the rewritten query."""
         }
 
@@ -138,11 +139,12 @@ class FoodRecommendationBot:
         return rewritten_query
 
     def _reformat_query(self, query):
+        """Reformat the query for parsing"""
         # Define the retrieval tool's capabilities
         system_message = {
             "role": "system",
             "content": f"""You are a query reformatting assistant that helps optimize queries for semantic search in a vector database.
-        
+
         Given an input query, re-format it in the format shown below:
         search: [cuisine][type of place][any other relevant context], location: [location], search_more: [True / False]
 
@@ -180,7 +182,7 @@ class FoodRecommendationBot:
 
     def _generate(self, question: str, docs: List[Dict], chat_history: str):
         """Generate answer"""
-        # docs_content = "\n\n".join(doc['text'] for doc in docs)
+        # Combine retrieved docs into single str
         docs_content = ""
         for doc in docs:
             distance = doc.get('distance', None)
@@ -191,18 +193,17 @@ class FoodRecommendationBot:
         source_list = "\n\nRetrieved the following places:\n"
         for doc in docs:
             source_list += (f"Name: {doc['place_name']} @ Zone: {doc['place_zone']}"
-                          f"(Place ID: {doc['place_id']})\n")
-            # print(f"Name: {doc['place_name']} @ Zone: {doc['place_zone']}"
-            #               f"(Place ID: {doc['place_id']})\n")
+                            f"(Place ID: {doc['place_id']})\n")
         if self.save_output:
             with open('query.txt', "w") as f:
                 f.write(question)
-        
+
+        # Prompt set-up
         system_prompt = (f"{food_assistant_prompt}\n"
-                      f"### Context:\n"
-                      f"{docs_content}\n"
-                      f"Previous Messages:"
-                      f"{chat_history}")
+                         f"### Context:\n"
+                         f"{docs_content}\n"
+                         f"Previous Messages:"
+                         f"{chat_history}")
         num_words = len(system_prompt.split())
         # print(f"Num words system prompt: {num_words}")
         if self.save_output:
@@ -222,6 +223,7 @@ class FoodRecommendationBot:
                 }
             ]
         else:
+            # Gemma does not have system prompt
             full_prompt = (f"{system_prompt}\n"
                            f"### Question:\n"
                            f"{question}\n"
@@ -257,9 +259,10 @@ class FoodRecommendationBot:
             yield source_dict
 
     def chroma_bm25_combine(self, query: str, subzone_list: list, chroma_n_results: int) -> List:
+        """Retrieve from Chroma and BM25 and then combine scores"""
         # Chroma processing
         chroma_results = self.retrieve_class.retrieve_and_join_chunks(query, subzone=subzone_list,
-                                                                 n_results=chroma_n_results)
+                                                                      n_results=chroma_n_results)
         chroma_place_id = []
         chroma_scores = np.zeros(len(chroma_results))
         for i, result in enumerate(chroma_results):
@@ -302,7 +305,7 @@ class FoodRecommendationBot:
         combined_results = sorted(combined_results, key=lambda x: x[1], reverse=True)
         combined_doc = [result[0] for result in combined_results]
         return combined_doc
-    
+
     def get_response(self, question: str, chat_history: List[dict]):
         """Get response for a given question"""
         # Update internal state history
@@ -314,14 +317,19 @@ class FoodRecommendationBot:
         if len(self.full_history) == self.max_num_full_history:
             self.full_history.pop(0)
 
-        # Form strings
+        # Form strings containing user historical context
         query_history_str = "".join(f"{msg['role']}: {msg['content']}\n" for msg in self.query_history)
         full_history_str = "".join(f"{msg['role']}: {msg['content']}\n" for msg in self.full_history)
+
         # Rewrite the query
         rewritten_query = self._rewrite_query(question, query_history_str)
         # print(f"\nRewritten query: {rewritten_query}")
+
+        # Reformat query for parsing
         reformat_query = self._reformat_query(rewritten_query)
         # print(f"\nReformat query: {reformat_query}")
+
+        # Parse reformatted query
         text_dict = {}
         full_query = ""  # Full query from reformatted query
         for part in reformat_query.split(","):
@@ -336,12 +344,12 @@ class FoodRecommendationBot:
                 text_dict[category] = text
                 if category != "search_more":
                     full_query += text + " "
-
         get_nearby = text_dict.get('search_more') in ['True']
         location = text_dict.get('location', "")
 
         all_docs = []
         subzone_search = {}
+        # If location is successfully parsed, get subzone and nearby subzones from location
         if location:
             if get_nearby:
                 subzone_search = self.subzone_finder.find_subzones(location, max_dist=3)
@@ -356,8 +364,8 @@ class FoodRecommendationBot:
             # print(f"Subzones found! Query: {full_query}, Subzones: {nearby_subzone_list}")
             combined_docs = self.chroma_bm25_combine(full_query, nearby_subzone_list, chroma_n_results)
             # print("Retrieved the following: ")
+            # For each doc, get distance away from base_zone
             for doc in combined_docs:
-                # print(f"Name: {doc['place_name']}")
                 doc_subzone = doc['place_zone']
                 distance = self.subzone_finder.subzone_distance(base_zone, doc_subzone)
                 doc['distance'] = distance
@@ -368,11 +376,13 @@ class FoodRecommendationBot:
             chroma_n_results = 20
             all_docs = self.chroma_bm25_combine(full_query, [], chroma_n_results)
 
+        # Sort by distance
+        all_docs = sorted(all_docs, key=lambda doc: doc.get("distance", float("inf")))
         if get_nearby:
-            all_docs = sorted(all_docs, key=lambda doc: doc.get("distance", float("inf")))[:20]
+            all_docs = all_docs[:20]
         else:
-            all_docs = sorted(all_docs, key=lambda doc: doc.get("distance", float("inf")))[:10]
-        
+            all_docs = all_docs[:10]
+
         # Stream the generation
         num_docs = len(all_docs)
         # print(f"Total number of docs: {num_docs}")
@@ -397,6 +407,7 @@ class FoodRecommendationBot:
             yield full_answer  # Yield the full answer when saving output
 
         return full_answer
+
 
 # Example usage
 if __name__ == "__main__":
