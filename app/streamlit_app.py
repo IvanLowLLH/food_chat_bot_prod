@@ -17,17 +17,21 @@ from together import Together
 load_dotenv()
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 FIREBASE_CREDS = "firebase_key.json"
+track_query = True
+if not os.path.exists(FIREBASE_CREDS):
+    track_query = False
 
 # Timezone settings
 SGT = pytz.timezone('Asia/Singapore')
 
 # Firestore database settings
-if not firebase_admin._apps:
-    cred = credentials.Certificate(FIREBASE_CREDS)
-    firebase_admin.initialize_app(cred)
+if track_query:
+    if not firebase_admin._apps:
+        cred = credentials.Certificate(FIREBASE_CREDS)
+        firebase_admin.initialize_app(cred)
+    # Connect to Firestore
+    db = firestore.client()
 
-# Connect to Firestore
-db = firestore.client()
 
 # LLM & embedding settings
 llm_model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo-128K"
@@ -41,7 +45,6 @@ n_first_lines = 3
 COOLDOWN_SECONDS = 2  # Time between queries
 MAX_QUERIES_PER_HOUR = 30  # Maximum queries per hour
 QUERY_WINDOW_HOURS = 1  # Time window for query counting
-TRACK_IP = True
 
 client = Together()
 vector_store = chromadb.PersistentClient(
@@ -104,9 +107,10 @@ def initialize_session_state():
             n_first_lines=n_first_lines,
             save_output=False
         )
-    if "ip_tracking" not in st.session_state:
-        client_ip = get_client_ip()
-        st.session_state.ip_tracking = load_ip_tracking(client_ip)
+    if track_query:
+        if "ip_tracking" not in st.session_state:
+            client_ip = get_client_ip()
+            st.session_state.ip_tracking = load_ip_tracking(client_ip)
 
 
 def get_current_time():
@@ -212,15 +216,16 @@ with st.sidebar:
         st.session_state.bot.full_history = []
         st.rerun()
 
-    st.markdown("---")
-    st.markdown("### Usage Limits")
-    client_ip = get_client_ip()
-    queries_remaining = MAX_QUERIES_PER_HOUR - len(st.session_state.ip_tracking["query_history"])
-    st.markdown(f"Queries remaining for you: **{queries_remaining}**")
+    if track_query:
+        st.markdown("---")
+        st.markdown("### Usage Limits")
+        client_ip = get_client_ip()
+        queries_remaining = MAX_QUERIES_PER_HOUR - len(st.session_state.ip_tracking["query_history"])
+        st.markdown(f"Queries remaining for you: **{queries_remaining}**")
 
-    if st.session_state.ip_tracking["query_history"]:
-        reset_time = parse_timestamp(st.session_state.ip_tracking["query_history"][0]) + timedelta(hours=QUERY_WINDOW_HOURS)
-        st.markdown(f"Next reset at: **{reset_time.strftime('%I:%M:%S %p')} SGT**")
+        if st.session_state.ip_tracking["query_history"]:
+            reset_time = parse_timestamp(st.session_state.ip_tracking["query_history"][0]) + timedelta(hours=QUERY_WINDOW_HOURS)
+            st.markdown(f"Next reset at: **{reset_time.strftime('%I:%M:%S %p')} SGT**")
 
     st.markdown("---")
     st.markdown("### About")
@@ -240,7 +245,7 @@ with st.sidebar:
 # Chat input
 if prompt := st.chat_input("What kind of food are you looking for?"):
     # Check rate limits
-    if TRACK_IP:
+    if track_query:
         can_query, message = can_make_query()
         if not can_query:
             st.error(message)
@@ -270,8 +275,9 @@ if prompt := st.chat_input("What kind of food are you looking for?"):
             st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # Save query to Firebase
-    current_time = get_current_time()
-    save_query_to_firebase(session_start_id, prompt, full_response, current_time)
+    if track_query:
+        current_time = get_current_time()
+        save_query_to_firebase(session_start_id, prompt, full_response, current_time)
 
-    # Update query tracking
-    update_query_tracking()
+        # Update query tracking
+        update_query_tracking()
